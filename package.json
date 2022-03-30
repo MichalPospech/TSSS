@@ -1,0 +1,27 @@
+{
+  "name": "tsat",
+  "version": "1.0.0",
+  "description": "Programming assignment for SAT class at Charles University",
+  "main": "index.js",
+  "scripts": {
+    "build": "eslint src && tsc",
+    "lint": "eslint src",
+    "format": "prettier"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/parsimmon": "^1.10.6",
+    "@typescript-eslint/eslint-plugin": "^5.17.0",
+    "@typescript-eslint/parser": "^5.17.0",
+    "eslint": "^8.12.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "typescript": "^4.6.3"
+  },
+  "dependencies": {
+    "parsimmon": "^1.18.1"
+  }
+}
