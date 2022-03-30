@@ -31,7 +31,7 @@ export const language = P.createLanguage<{
 }>({
   formula: (r) => P.alt(r.and, r.or, r.variable, r.negation),
   and: (r) =>
-    P.seqObj<Conjunction>(
+    P.seqObj(
       r.lParen,
       P.whitespace,
       P.string("and"),
@@ -42,7 +42,7 @@ export const language = P.createLanguage<{
       r.rParen
     ),
   or: (r) =>
-    P.seqObj<Disjunction>(
+    P.seqObj(
       r.lParen,
       P.whitespace,
       P.string("or"),
@@ -53,22 +53,14 @@ export const language = P.createLanguage<{
       r.rParen
     ),
   variable: () =>
-    P.regex(RegExp("[a-zA-Z][a-zA-Z0-9]*")).map<Variable>(
+    P.regex(RegExp("[a-zA-Z][a-zA-Z0-9]*")).map(
       (s) =>
         <Variable>{
           name: s,
         }
     ),
   negation: (r) =>
-    P.seqObj<Negation>(
-      r.lParen,
-      P.whitespace,
-      P.string("not"),
-      P.whitespace,
-      ["var", r.variable],
-      P.whitespace,
-      r.rParen
-    ),
+    P.seqObj(r.lParen, P.whitespace, P.string("not"), P.whitespace, ["var", r.variable], P.whitespace, r.rParen),
   lParen: () => P.string("("),
   rParen: () => P.string(")"),
 });
