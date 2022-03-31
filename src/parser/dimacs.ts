@@ -1,18 +1,18 @@
 import * as P from "parsimmon";
 
-interface Variable {
+export interface Variable {
   name: string;
 }
 
-interface NegatedVariable {
+export interface NegatedVariable {
   variable: Variable;
 }
-interface Clause {
-  variables: Array<Variable | NegatedVariable>;
+export interface Clause {
+  variables: Set<Variable | NegatedVariable>;
 }
 
-interface CNFFormula {
-  clauses: Array<Clause>;
+export interface CNFFormula {
+  clauses: Set<Clause>;
 }
 
 export const parser = P.createLanguage<{
@@ -29,7 +29,16 @@ export const parser = P.createLanguage<{
   variable: () => P.regex(RegExp("[1-9][0-9]*")).map((s) => <Variable>{ name: s }),
   negatedVariable: (r) => P.seqObj(P.string("-"), ["variable", r.variable]),
   clause: (r) =>
-    P.seqObj(["variables", P.alt(r.variable, r.negatedVariable).sepBy(P.whitespace)], P.whitespace, P.string("0")),
-  formula: (r) => P.seqObj(["clauses", r.clause.many()]),
+    P.seqObj(
+      [
+        "variables",
+        P.alt(r.variable, r.negatedVariable)
+          .sepBy(P.whitespace)
+          .map((v) => new Set(v)),
+      ],
+      P.whitespace,
+      P.string("0")
+    ),
+  formula: (r) => P.seqObj(["clauses", r.clause.many().map((c) => new Set(c))]),
   file: (r) => r.comment.many().then(r.desc).then(r.formula),
 });

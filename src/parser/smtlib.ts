@@ -1,24 +1,24 @@
 import * as P from "parsimmon";
 
-interface Variable {
+export interface Variable {
   name: string;
 }
 
-interface Conjunction {
+export interface Conjunction {
   f1: NNFFormula;
   f2: NNFFormula;
 }
 
-interface Negation {
+export interface Negation {
   var: Variable;
 }
 
-interface Disjunction {
+export interface Disjunction {
   f1: NNFFormula;
   f2: NNFFormula;
 }
 
-type NNFFormula = Negation | Disjunction | Conjunction | Variable;
+export type NNFFormula = Negation | Disjunction | Conjunction | Variable;
 
 export const language = P.createLanguage<{
   formula: NNFFormula;
