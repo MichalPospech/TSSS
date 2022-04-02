@@ -1,7 +1,7 @@
 import { language } from "../../src/parser/smtlib";
 
 test("Parse variable", () => {
-  expect(language.formula.tryParse("abc")).toStrictEqual({ name: "abc" });
+  expect(language.formula.tryParse("abc")).toStrictEqual({ type: "var", name: "abc" });
 });
 
 test("Don't parse anything starting with a digit", () => {
@@ -9,7 +9,7 @@ test("Don't parse anything starting with a digit", () => {
 });
 
 test("Parse negation", () => {
-  expect(language.formula.tryParse("( not abc )")).toStrictEqual({ var: { name: "abc" } });
+  expect(language.formula.tryParse("( not abc )")).toStrictEqual({ type: "not", var: { type: "var", name: "abc" } });
 });
 
 test("Don't parse non-matched parentheses - negation", () => {

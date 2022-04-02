@@ -1,6 +1,8 @@
 export interface Variable {
+  type: "var";
   name: string;
 }
-export interface Negation<T extends Variable> {
-  var: T;
+export interface Negation {
+  var: Variable;
+  type: "not";
 }

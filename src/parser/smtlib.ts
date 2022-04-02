@@ -1,48 +1,29 @@
 import * as P from "parsimmon";
 import { Negation, Variable } from "../types/common";
-import { Conjunction, Disjunction, NNFFormula } from "../types/nnf";
+import { Operator, NNFFormula } from "../types/nnf";
+
+const lParenParser = P.string("(");
+const rParenParser = P.string(")");
 
 export const language = P.createLanguage<{
-  formula: NNFFormula<Variable, Negation<Variable>>;
-  and: Conjunction<Variable, Negation<Variable>>;
-  or: Disjunction<Variable, Negation<Variable>>;
+  formula: NNFFormula;
+  operator: Operator;
   variable: Variable;
-  negation: Negation<Variable>;
-  lParen: string;
-  rParen: string;
+  negation: Negation;
 }>({
-  formula: (r) => P.alt(r.and, r.or, r.variable, r.negation),
-  and: (r) =>
-    P.seqObj(
-      r.lParen,
-      P.whitespace,
-      P.string("and"),
-      ["f1", r.formula],
-      P.whitespace,
-      ["f2", r.formula],
-      P.whitespace,
-      r.rParen
-    ),
-  or: (r) =>
-    P.seqObj(
-      r.lParen,
-      P.whitespace,
-      P.string("or"),
-      ["f1", r.formula],
-      P.whitespace,
-      ["f2", r.formula],
-      P.whitespace,
-      r.rParen
-    ),
-  variable: () =>
-    P.regex(RegExp("[a-zA-Z][a-zA-Z0-9]*")).map(
-      (s) =>
-        <Variable>{
-          name: s,
-        }
-    ),
+  formula: (r) => P.alt(r.operator, r.variable, r.negation),
+  variable: () => P.regex(new RegExp("[a-zA-Z][a-zA-Z0-9]*")).map((v) => <Variable>{ name: v, type: "var" }),
   negation: (r) =>
-    P.seqObj(r.lParen, P.whitespace, P.string("not"), P.whitespace, ["var", r.variable], P.whitespace, r.rParen),
-  lParen: () => P.string("("),
-  rParen: () => P.string(")"),
+    P.seqMap(P.string("not").skip(P.whitespace), r.variable, (s: string, v: Variable) => <Negation>{ var: v, type: s })
+      .trim(P.whitespace)
+      .wrap(lParenParser, rParenParser),
+  operator: (r) =>
+    P.seqMap(
+      P.regex(new RegExp("or|and")).skip(P.whitespace),
+      r.formula.skip(P.whitespace),
+      r.formula,
+      (op: string, f1: NNFFormula, f2: NNFFormula) => <Operator>{ type: op, f1: f1, f2: f2 }
+    )
+      .trim(P.whitespace)
+      .wrap(lParenParser, rParenParser),
 });
