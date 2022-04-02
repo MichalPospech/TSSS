@@ -6,7 +6,9 @@
   "scripts": {
     "build": "eslint src && tsc",
     "lint": "eslint src",
-    "format": "prettier"
+    "format": "prettier",
+    "test": "jest",
+    "run:parsing": "node ./dist/parsing.js"
   },
   "author": "",
   "license": "ISC",
