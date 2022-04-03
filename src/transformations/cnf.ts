@@ -1,3 +1,4 @@
+import arrUnion from "arr-union";
 import { CNFFormula, createClause, createCNFFormula } from "../types/cnf";
 import { createNegation, createVariable, Negation, Variable } from "../types/common";
 import { NNFFormula } from "../types/nnf";
@@ -54,5 +55,17 @@ function negateLiteral(literal: Literal): Literal {
 
     case "not":
       return literal.var;
+  }
+}
+
+function collectVariables(formula: NNFFormula): Variable[] {
+  switch (formula.type) {
+    case "var":
+      return [formula];
+    case "not":
+      return collectVariables(formula.var);
+    case "and" || "or": {
+      return arrUnion([collectVariables(formula.f1), collectVariables(formula.f2)].flat());
+    }
   }
 }

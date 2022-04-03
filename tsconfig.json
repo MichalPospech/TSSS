@@ -5,6 +5,7 @@
     "module": "CommonJS", // which system for the program AMD, UMD, System, CommonJS
     // Recommended: Compiler complains about expressions implicitly typed as 'any'
     "noImplicitAny": true,
+    "esModuleInterop": true
   },
   "include": [
     "src"
