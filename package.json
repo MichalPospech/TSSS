@@ -28,7 +28,12 @@
   },
   "dependencies": {
     "@types/arr-union": "^3.1.0",
+    "@types/array-unique": "^0.3.0",
+    "@types/yargs": "^17.0.10",
     "arr-union": "^3.1.0",
-    "parsimmon": "^1.18.1"
+    "array-unique": "^0.3.2",
+    "gensequence": "^3.1.1",
+    "parsimmon": "^1.18.1",
+    "yargs": "^17.4.0"
   }
 }
