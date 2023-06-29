@@ -1,4 +1,4 @@
-import * as P from "parsimmon";
+import P from "parsimmon";
 import { Variable, Negation } from "../types/common";
 import { CNFFormula, Clause } from "../types/cnf";
 
@@ -18,7 +18,7 @@ export const parser = P.createLanguage<{
       .chain((_) => r.variable)
       .map((v) => <Negation>{ var: v, type: "not" }),
   clause: (r) =>
-    P.seqObj(["variables", P.alt(r.variable, r.negatedVariable).sepBy(P.whitespace)], P.whitespace, P.string("0")),
+    P.seqObj(["literals", P.alt(r.variable, r.negatedVariable).sepBy(P.whitespace)], P.whitespace, P.string("0")),
   formula: (r) =>
     r.comment
       .many()

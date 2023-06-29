@@ -1,7 +1,7 @@
 import { genSequence, Sequence } from "gensequence";
-import { CNFFormula, createClause, createCNFFormula } from "../types/cnf";
-import { createNegation, createVariable, Negation, Variable } from "../types/common";
-import { collectVariables, createOperator, NNFFormula } from "../types/nnf";
+import { CNFFormula, createClause, createCNFFormula } from "../types/cnf.js";
+import { createNegation, createVariable, Negation, Variable } from "../types/common.js";
+import { collectVariables, createOperator, NNFFormula } from "../types/nnf.js";
 
 type Literal = Negation | Variable;
 
@@ -16,13 +16,17 @@ export function fromNNF(formula: NNFFormula, bidirectional = true): [CNFFormula,
   });
   const mapping = createVariableMaping(vars, nameGenerator);
   const renamedFormula = renameVariables(formula, (s) => mapping.get(s));
-  const [cnf, topLevelVar] = fromNNFInternal(renamedFormula, nameGenerator, bidirectional);
+  const [cnf, topLevelVar] = fromNNFInternal(renamedFormula, nameGenerator.skip(mapping.size), bidirectional);
   const completeCNF = mergeCNFs(createCNFFormula(createClause(topLevelVar)), cnf);
   const originalVariablesNotes = Array.from(mapping.entries()).map(
     ([originalVar, newVar]) => `${originalVar} → ${newVar}`
   );
   const topVarName = topLevelVar.type === "var" ? topLevelVar.name : topLevelVar.var.name;
-  const notes = ["Original variables mappings", ...originalVariablesNotes, `Root variable from Tseitin: ${topVarName}`];
+  const notes = [
+    "Original variables mappings",
+    ...originalVariablesNotes,
+    `Root variable from Tseitin encoding: ${topVarName}`,
+  ];
   return [completeCNF, notes];
 }
 
@@ -33,11 +37,11 @@ function fromNNFInternal(
 ): [CNFFormula, Literal] {
   switch (formula.type) {
     case "not": {
-      const cnf = createCNFFormula(createClause(formula));
-      return [cnf, formula];
+      const cnf = createCNFFormula();
+      return [cnf, negateLiteral(formula)];
     }
     case "var": {
-      const cnf = createCNFFormula(createClause(formula));
+      const cnf = createCNFFormula();
       return [cnf, formula];
     }
     case "and": {
@@ -46,10 +50,10 @@ function fromNNFInternal(
       const [cnfR, litR] = fromNNFInternal(formula.f2, variableNamesGenerator, bidirectional);
       const cnf = bidirectional
         ? createCNFFormula(
-            createClause(negateLiteral(litL), negateLiteral(litR), variable),
-            createClause(litL, negateLiteral(variable)),
-            createClause(litR, negateLiteral(variable))
-          )
+          createClause(negateLiteral(litL), negateLiteral(litR), variable),
+          createClause(litL, negateLiteral(variable)),
+          createClause(litR, negateLiteral(variable))
+        )
         : createCNFFormula(createClause(litL, negateLiteral(variable)), createClause(litR, negateLiteral(variable)));
       const mergedCNF = mergeCNFs(cnf, cnfL, cnfR);
       return [mergedCNF, variable];
@@ -60,10 +64,10 @@ function fromNNFInternal(
       const [cnfR, litR] = fromNNFInternal(formula.f2, variableNamesGenerator, bidirectional);
       const cnf = bidirectional
         ? createCNFFormula(
-            createClause(litL, litR, negateLiteral(variable)),
-            createClause(negateLiteral(litL), variable),
-            createClause(negateLiteral(litR), variable)
-          )
+          createClause(litL, litR, negateLiteral(variable)),
+          createClause(negateLiteral(litL), variable),
+          createClause(negateLiteral(litR), variable)
+        )
         : createCNFFormula(createClause(litL, litR, negateLiteral(variable)));
       const mergedCNF = mergeCNFs(cnf, cnfL, cnfR);
       return [mergedCNF, variable];
@@ -94,13 +98,14 @@ function createVariableMaping(variables: string[], nameGenerator: Sequence<strin
 
 function renameVariables(formula: NNFFormula, newName: (s: string) => string): NNFFormula {
   switch (formula.type) {
-    case "and" || "or": {
+    case "or":
+    case "and": {
       const left = renameVariables(formula.f1, newName);
       const right = renameVariables(formula.f2, newName);
       return createOperator(formula.type, left, right);
     }
     case "not": {
-      const variable = createVariable(formula.var.name);
+      const variable = createVariable(newName(formula.var.name));
       const negated = createNegation(variable);
       return negated;
     }

@@ -1,4 +1,4 @@
-import arrUnion from "arr-union";
+import union from "arr-union";
 import { Negation, Variable } from "./common";
 
 export interface Operator {
@@ -23,8 +23,9 @@ export function collectVariables(formula: NNFFormula): string[] {
       return [formula.name];
     case "not":
       return collectVariables(formula.var);
-    case "and" || "or": {
-      return arrUnion([collectVariables(formula.f1), collectVariables(formula.f2)].flat());
+    case 'or':
+    case "and": {
+      return union(collectVariables(formula.f1), collectVariables(formula.f2));
     }
   }
 }

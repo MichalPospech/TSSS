@@ -1,5 +1,5 @@
 import { EOL } from "os";
-import { Clause, CNFFormula, extractVariableNames } from "../types/cnf";
+import { Clause, CNFFormula, extractVariableNames } from "../types/cnf.js";
 
 export function convertToString(formula: CNFFormula): string {
   const variableCount = extractVariableNames(formula).length;

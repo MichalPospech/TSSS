@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Programming assignment for SAT class at Charles University",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "eslint src && tsc",
     "lint": "eslint src",
