@@ -1,5 +1,6 @@
 import { EOL } from "os";
-import { Clause, CNFFormula, extractVariableNames } from "../types/cnf.js";
+import { Clause, CNFFormula } from "../types/cnf.js";
+import arrayUnique from "array-unique";
 
 export function convertToString(formula: CNFFormula, comments: string[]): string {
   const variableCount = extractVariableNames(formula).length;
@@ -21,4 +22,21 @@ function convertClauseToString(clause: Clause): string {
     })
     .join(" ")
     .concat(" 0");
+}
+
+function extractVariableNames(formula: CNFFormula): string[] {
+  return arrayUnique(formula.clauses.map(extractVariablesFromClause).flat());
+}
+
+function extractVariablesFromClause(formula: Clause): string[] {
+  return arrayUnique(
+    formula.literals.map((l) => {
+      switch (l.type) {
+        case "not":
+          return l.var.name;
+        case "var":
+          return l.name;
+      }
+    })
+  );
 }

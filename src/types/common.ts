@@ -1,8 +1,8 @@
-export interface Variable {
+export type Variable = {
   type: "var";
   name: string;
 }
-export interface Negation {
+export type Negation = {
   var: Variable;
   type: "not";
 }

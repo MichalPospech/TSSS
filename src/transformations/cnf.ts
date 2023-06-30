@@ -1,7 +1,8 @@
 import { genSequence, Sequence } from "gensequence";
 import { CNFFormula, createClause, createCNFFormula } from "../types/cnf.js";
 import { createNegation, createVariable, Negation, Variable } from "../types/common.js";
-import { collectVariables, createOperator, NNFFormula } from "../types/nnf.js";
+import { createOperator, NNFFormula } from "../types/nnf.js";
+import union from "arr-union";
 
 type Literal = Negation | Variable;
 
@@ -111,6 +112,19 @@ function renameVariables(formula: NNFFormula, newName: (s: string) => string): N
     }
     case "var": {
       return createVariable(newName(formula.name));
+    }
+  }
+}
+
+export function collectVariables(formula: NNFFormula): string[] {
+  switch (formula.type) {
+    case "var":
+      return [formula.name];
+    case "not":
+      return collectVariables(formula.var);
+    case 'or':
+    case "and": {
+      return union(collectVariables(formula.f1), collectVariables(formula.f2));
     }
   }
 }
